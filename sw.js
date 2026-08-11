@@ -1,5 +1,5 @@
 // オフラインでも起動できるようにするための簡易サービスワーカー。
-const CACHE = "yt-short-recorder-v1";
+const CACHE = "yt-short-recorder-v2";
 const ASSETS = [
   "./",
   "./index.html",

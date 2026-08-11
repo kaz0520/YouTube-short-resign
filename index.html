@@ -66,24 +66,14 @@
     margin-bottom: 16px;
   }
 
-  .prompt {
-    text-align: center;
-  }
+  .prompt { text-align: center; }
   .prompt .lead { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; }
   .prompt .sub { font-size: .92rem; color: var(--muted); white-space: pre-line; }
 
   .btn {
-    display: block;
-    width: 100%;
-    border: none;
-    border-radius: 12px;
-    padding: 16px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    cursor: pointer;
-    color: #fff;
-    background: var(--accent);
-    transition: transform .05s ease, opacity .2s ease;
+    display: block; width: 100%; border: none; border-radius: 12px; padding: 16px;
+    font-size: 1.05rem; font-weight: 700; cursor: pointer; color: #fff;
+    background: var(--accent); transition: transform .05s ease, opacity .2s ease;
     font-family: inherit;
   }
   .btn:active { transform: scale(.985); }
@@ -92,12 +82,8 @@
   .btn + .btn { margin-top: 10px; }
 
   .timer {
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-    font-size: 3rem;
-    font-weight: 700;
-    letter-spacing: .04em;
-    margin: 8px 0 6px;
+    text-align: center; font-variant-numeric: tabular-nums; font-size: 3rem;
+    font-weight: 700; letter-spacing: .04em; margin: 8px 0 6px;
   }
   .timer-label { text-align: center; color: var(--muted); font-size: .85rem; margin-bottom: 20px; }
 
@@ -108,14 +94,6 @@
   .survey-btn.good { background: var(--good); }
   .survey-btn.normal { background: var(--normal); }
   .survey-btn.regret { background: var(--regret); }
-
-  .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
-  .tab {
-    flex: 1; text-align: center; padding: 10px; border-radius: 10px;
-    background: transparent; border: 1px solid var(--border); color: var(--muted);
-    font-weight: 600; cursor: pointer; font-size: .9rem; font-family: inherit;
-  }
-  .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
   .stats { display: flex; gap: 10px; margin-bottom: 16px; }
   .stat {
@@ -144,6 +122,29 @@
   .link {
     background: none; border: none; color: var(--muted); font-size: .78rem;
     cursor: pointer; text-decoration: underline; font-family: inherit;
+  }
+  .link + .link { margin-left: 14px; }
+
+  .sync-status {
+    text-align: center; font-size: .76rem; color: var(--muted); margin-bottom: 12px;
+    min-height: 1.1em;
+  }
+  .sync-status.err { color: var(--regret); }
+  .sync-status.ok { color: var(--good); }
+
+  .field-label { font-size: .82rem; font-weight: 600; margin-bottom: 6px; }
+  .field-help { font-size: .78rem; color: var(--muted); margin: 6px 0 14px; white-space: pre-line; }
+  .keybox {
+    display: flex; gap: 8px; align-items: center; margin-bottom: 6px;
+  }
+  input[type="text"] {
+    width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font-size: .95rem; font-family: inherit;
+  }
+  .btn-sm {
+    border: 1px solid var(--border); background: transparent; color: var(--text);
+    border-radius: 10px; padding: 10px 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; white-space: nowrap; font-size: .85rem;
   }
   .hidden { display: none !important; }
 </style>
@@ -189,6 +190,7 @@
 
   <!-- 履歴 -->
   <section id="view-history" class="hidden">
+    <div class="sync-status" id="syncStatus"></div>
     <div class="stats">
       <div class="stat"><div class="num" id="statCount">0</div><div class="lbl">合計視聴回数</div></div>
       <div class="stat"><div class="num" id="statTime">0分</div><div class="lbl">合計視聴時間</div></div>
@@ -199,7 +201,26 @@
     </div>
     <div class="footer-actions">
       <button class="btn secondary" id="backHomeBtn">ホームに戻る</button>
-      <button class="link" id="clearBtn">履歴をすべて削除</button>
+      <div style="margin-top:12px">
+        <button class="link" id="syncBtn">今すぐ同期</button>
+        <button class="link" id="settingsBtn">合言葉の設定</button>
+        <button class="link" id="clearBtn">履歴をすべて削除</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 設定(合言葉) -->
+  <section id="view-settings" class="hidden">
+    <div class="card">
+      <div class="field-label">あなたの合言葉（同期キー）</div>
+      <div class="keybox">
+        <input type="text" id="keyInput" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="field-help">この合言葉を別の端末（スマホ・PC）で同じように入力すると、履歴が同期されます。
+合言葉を知っている人は履歴を見られます。他人に教えないでください。</div>
+      <button class="btn" id="saveKeyBtn">この合言葉で同期する</button>
+      <button class="btn secondary" id="copyKeyBtn">合言葉をコピー</button>
+      <button class="btn secondary" id="settingsBackBtn">戻る</button>
     </div>
   </section>
 </div>
@@ -208,41 +229,134 @@
 (function () {
   "use strict";
 
+  // ===== 設定 ====================================================
+  var SUPABASE_URL = "https://yqlbidxvkvzyhvjgiohl.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_4iq7eg1Sx_UtD-NsZMcirw_DpejNR_8";
+
   var STORAGE_KEY = "yt_short_sessions_v1";
   var ACTIVE_KEY  = "yt_short_active_v1";
+  var SPACE_KEY   = "yt_short_space_key_v1";
 
-  // ---- データ層 -------------------------------------------------
+  // ===== 合言葉(スペースキー) ====================================
+  function genKey() {
+    var alphabet = "abcdefghjkmnpqrstuvwxyz23456789"; // 紛らわしい文字を除外
+    var bytes = new Uint8Array(20);
+    (window.crypto || window.msCrypto).getRandomValues(bytes);
+    var s = "";
+    for (var i = 0; i < bytes.length; i++) {
+      s += alphabet[bytes[i] % alphabet.length];
+      if (i % 5 === 4 && i !== bytes.length - 1) s += "-";
+    }
+    return s;
+  }
+  function getSpaceKey() {
+    var k = localStorage.getItem(SPACE_KEY);
+    if (!k) { k = genKey(); localStorage.setItem(SPACE_KEY, k); }
+    return k;
+  }
+  function setSpaceKey(k) { localStorage.setItem(SPACE_KEY, k); }
+
+  function uuid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = (Math.random() * 16) | 0, v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  // ===== ローカル保存(オフラインキャッシュ＋送信待ちキュー) =====
   function loadSessions() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     catch (e) { return []; }
   }
-  function saveSessions(list) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  }
+  function saveSessions(list) { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
   function loadActive() {
-    try { return JSON.parse(localStorage.getItem(ACTIVE_KEY)); }
-    catch (e) { return null; }
+    try { return JSON.parse(localStorage.getItem(ACTIVE_KEY)); } catch (e) { return null; }
   }
   function saveActive(v) {
     if (v) localStorage.setItem(ACTIVE_KEY, JSON.stringify(v));
     else localStorage.removeItem(ACTIVE_KEY);
   }
 
-  // ---- ユーティリティ -------------------------------------------
+  // ===== Supabase RPC ============================================
+  function rpc(fn, body) {
+    return fetch(SUPABASE_URL + "/rest/v1/rpc/" + fn, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    }).then(function (res) {
+      if (!res.ok) return res.text().then(function (t) { throw new Error(t || res.status); });
+      return res.status === 204 ? null : res.json();
+    });
+  }
+
+  // 未同期の記録をクラウドへ送る → クラウドの記録を取り込む
+  function syncNow() {
+    var key = getSpaceKey();
+    var list = loadSessions();
+    var pending = list.filter(function (s) { return !s.synced; });
+
+    setSync("同期中…");
+
+    var pushChain = pending.reduce(function (p, s) {
+      return p.then(function () {
+        return rpc("short_add_session", {
+          p_id: s.id, p_space_key: key,
+          p_start_ms: s.start, p_end_ms: s.end,
+          p_duration: s.durationMs, p_feeling: s.feeling, p_day: s.date
+        }).then(function () { s.synced = true; });
+      });
+    }, Promise.resolve());
+
+    return pushChain
+      .then(function () { saveSessions(list); return rpc("short_get_sessions", { p_space_key: key }); })
+      .then(function (rows) {
+        var local = loadSessions();
+        var byId = {};
+        local.forEach(function (s) { byId[s.id] = s; });
+        (rows || []).forEach(function (r) {
+          if (!byId[r.id]) {
+            local.push({
+              id: r.id, start: r.start_ms, end: r.end_ms,
+              durationMs: r.duration_ms, feeling: r.feeling, date: r.day, synced: true
+            });
+          }
+        });
+        saveSessions(local);
+        setSync("同期済み ・ " + nowLabel(), "ok");
+        renderHistory();
+      })
+      .catch(function (e) {
+        setSync("オフライン（ローカルに保存済み）", "err");
+      });
+  }
+
+  function nowLabel() {
+    var d = new Date();
+    return pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+  function setSync(msg, cls) {
+    var el = document.getElementById("syncStatus");
+    el.textContent = msg || "";
+    el.className = "sync-status" + (cls ? " " + cls : "");
+  }
+
+  // ===== ユーティリティ ==========================================
   function pad(n) { return n < 10 ? "0" + n : "" + n; }
   function fmtClock(ms) {
     var s = Math.floor(ms / 1000);
-    var h = Math.floor(s / 3600);
-    var m = Math.floor((s % 3600) / 60);
-    var sec = s % 60;
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
     if (h > 0) return h + ":" + pad(m) + ":" + pad(sec);
     return pad(m) + ":" + pad(sec);
   }
   function fmtDuration(ms) {
     var totalMin = Math.round(ms / 60000);
     if (totalMin < 60) return totalMin + "分";
-    var h = Math.floor(totalMin / 60);
-    var m = totalMin % 60;
+    var h = Math.floor(totalMin / 60), m = totalMin % 60;
     return h + "時間" + (m ? m + "分" : "");
   }
   function dateKey(ts) {
@@ -260,12 +374,13 @@
     return pad(d.getHours()) + ":" + pad(d.getMinutes());
   }
 
-  // ---- 画面切り替え ---------------------------------------------
+  // ===== 画面切り替え ============================================
   var views = {
-    home:    document.getElementById("view-home"),
-    active:  document.getElementById("view-active"),
-    survey:  document.getElementById("view-survey"),
-    history: document.getElementById("view-history")
+    home:     document.getElementById("view-home"),
+    active:   document.getElementById("view-active"),
+    survey:   document.getElementById("view-survey"),
+    history:  document.getElementById("view-history"),
+    settings: document.getElementById("view-settings")
   };
   function show(name) {
     Object.keys(views).forEach(function (k) {
@@ -273,15 +388,12 @@
     });
   }
 
-  // ---- タイマー -------------------------------------------------
+  // ===== タイマー ================================================
   var tickInterval = null;
   var timerDisplay = document.getElementById("timerDisplay");
   var startedAtLabel = document.getElementById("startedAtLabel");
-
   function startTicking(startTs) {
-    function update() {
-      timerDisplay.textContent = fmtClock(Date.now() - startTs);
-    }
+    function update() { timerDisplay.textContent = fmtClock(Date.now() - startTs); }
     update();
     startedAtLabel.textContent = fmtTimeOfDay(startTs) + " から視聴中…";
     tickInterval = setInterval(update, 1000);
@@ -290,8 +402,8 @@
     if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
   }
 
-  // ---- アクション -----------------------------------------------
-  var pendingSession = null; // {start, end, durationMs}
+  // ===== アクション ==============================================
+  var pendingSession = null;
 
   function beginViewing() {
     var startTs = Date.now();
@@ -305,11 +417,7 @@
     if (!active) { show("home"); return; }
     stopTicking();
     var endTs = Date.now();
-    pendingSession = {
-      start: active.start,
-      end: endTs,
-      durationMs: endTs - active.start
-    };
+    pendingSession = { start: active.start, end: endTs, durationMs: endTs - active.start };
     saveActive(null);
     document.getElementById("surveyTime").textContent =
       "視聴時間: " + fmtDuration(pendingSession.durationMs);
@@ -320,34 +428,34 @@
     if (!pendingSession) { show("home"); return; }
     var list = loadSessions();
     list.push({
+      id: uuid(),
       start: pendingSession.start,
       end: pendingSession.end,
       durationMs: pendingSession.durationMs,
       feeling: feeling,
-      date: dateKey(pendingSession.start)
+      date: dateKey(pendingSession.start),
+      synced: false
     });
     saveSessions(list);
     pendingSession = null;
     renderHistory();
     show("history");
+    syncNow();
   }
 
-  // ---- 履歴描画 -------------------------------------------------
+  // ===== 履歴描画 ================================================
   function renderHistory() {
     var list = loadSessions();
-    var count = list.length;
-    var totalMs = 0, regret = 0;
+    var count = list.length, totalMs = 0, regret = 0;
     list.forEach(function (s) {
       totalMs += s.durationMs;
       if (s.feeling === "regret") regret++;
     });
-
     document.getElementById("statCount").textContent = count;
     document.getElementById("statTime").textContent = count ? fmtDuration(totalMs) : "0分";
     document.getElementById("statRegret").textContent =
       count ? Math.round((regret / count) * 100) + "%" : "0%";
 
-    // 日別に集計
     var byDay = {};
     list.forEach(function (s) {
       if (!byDay[s.date]) byDay[s.date] = { count: 0, ms: 0, good: 0, normal: 0, regret: 0 };
@@ -367,52 +475,79 @@
       if (d.good)   badges += '<span class="badge good">良 ' + d.good + '</span>';
       if (d.normal) badges += '<span class="badge normal">普 ' + d.normal + '</span>';
       if (d.regret) badges += '<span class="badge regret">悔 ' + d.regret + '</span>';
-      return '<div class="day-row">' +
-               '<div>' +
-                 '<div class="day-date">' + fmtDateLabel(key) + '</div>' +
-                 '<div class="day-meta">' + d.count + '回 ・ ' + fmtDuration(d.ms) + '</div>' +
-               '</div>' +
-               '<div class="badges">' + badges + '</div>' +
-             '</div>';
+      return '<div class="day-row"><div>' +
+               '<div class="day-date">' + fmtDateLabel(key) + '</div>' +
+               '<div class="day-meta">' + d.count + '回 ・ ' + fmtDuration(d.ms) + '</div>' +
+             '</div><div class="badges">' + badges + '</div></div>';
     }).join("");
   }
 
-  // ---- イベント登録 ---------------------------------------------
+  function openHistory() { renderHistory(); show("history"); syncNow(); }
+
+  // ===== 設定(合言葉) ============================================
+  function openSettings() {
+    document.getElementById("keyInput").value = getSpaceKey();
+    show("settings");
+  }
+  function saveKeyAndSync() {
+    var v = document.getElementById("keyInput").value.trim();
+    if (v.length < 6) { alert("合言葉は6文字以上にしてください。"); return; }
+    setSpaceKey(v);
+    // 合言葉を変えたら、ローカルの記録を新しい合言葉にひも付け直して同期
+    var list = loadSessions();
+    list.forEach(function (s) { s.synced = false; });
+    saveSessions(list);
+    show("history");
+    renderHistory();
+    syncNow();
+  }
+  function copyKey() {
+    var v = document.getElementById("keyInput").value;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(v).then(function () { alert("合言葉をコピーしました。"); },
+        function () { prompt("この合言葉をコピーしてください:", v); });
+    } else {
+      prompt("この合言葉をコピーしてください:", v);
+    }
+  }
+
+  // ===== イベント登録 ============================================
   document.getElementById("startBtn").addEventListener("click", beginViewing);
   document.getElementById("stopBtn").addEventListener("click", endViewing);
-  document.getElementById("toHistoryBtn").addEventListener("click", function () {
-    renderHistory(); show("history");
-  });
-  document.getElementById("backHomeBtn").addEventListener("click", function () {
-    show("home");
-  });
+  document.getElementById("toHistoryBtn").addEventListener("click", openHistory);
+  document.getElementById("backHomeBtn").addEventListener("click", function () { show("home"); });
+  document.getElementById("syncBtn").addEventListener("click", syncNow);
+  document.getElementById("settingsBtn").addEventListener("click", openSettings);
+  document.getElementById("settingsBackBtn").addEventListener("click", function () { show("history"); });
+  document.getElementById("saveKeyBtn").addEventListener("click", saveKeyAndSync);
+  document.getElementById("copyKeyBtn").addEventListener("click", copyKey);
   document.getElementById("clearBtn").addEventListener("click", function () {
-    if (confirm("すべての履歴を削除します。よろしいですか？")) {
-      saveSessions([]); renderHistory();
-    }
+    if (!confirm("この合言葉の履歴をすべて削除します。よろしいですか？")) return;
+    var key = getSpaceKey();
+    rpc("short_clear_sessions", { p_space_key: key }).catch(function () {});
+    saveSessions([]);
+    renderHistory();
+    setSync("削除しました");
   });
-  Array.prototype.forEach.call(
-    document.querySelectorAll(".survey-btn"),
-    function (btn) {
-      btn.addEventListener("click", function () {
-        submitFeeling(btn.getAttribute("data-feeling"));
-      });
-    }
-  );
+  Array.prototype.forEach.call(document.querySelectorAll(".survey-btn"), function (btn) {
+    btn.addEventListener("click", function () { submitFeeling(btn.getAttribute("data-feeling")); });
+  });
 
-  // ---- 初期化: 視聴中に閉じていた場合は復帰 ----------------------
+  // ===== 初期化 ==================================================
+  getSpaceKey(); // 未生成なら合言葉を作る
   var active = loadActive();
   if (active && active.start) {
-    show("active");
-    startTicking(active.start);
+    show("active"); startTicking(active.start);
   } else {
     show("home");
   }
+  // 起動時にバックグラウンドで同期(失敗しても無視)
+  syncNow();
 
-  // ---- オフライン起動用にサービスワーカーを登録 -----------------
+  // オフライン起動用のサービスワーカー登録
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js").catch(function () { /* 失敗しても通常動作 */ });
+      navigator.serviceWorker.register("sw.js").catch(function () {});
     });
   }
 })();
