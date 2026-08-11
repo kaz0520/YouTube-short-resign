@@ -1,0 +1,19 @@
+{
+  "name": "ショート視聴レコーダー",
+  "short_name": "視聴レコーダー",
+  "description": "無意識のショート視聴を記録し、意識的な選択に変える個人用ツール",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f5f6f8",
+  "theme_color": "#2563eb",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

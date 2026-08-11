@@ -2,8 +2,16 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ショート視聴レコーダー</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2563eb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="視聴レコーダー">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg">
 <style>
   :root {
     --bg: #f5f6f8;
@@ -39,7 +47,7 @@
     display: flex;
     justify-content: center;
     min-height: 100%;
-    padding: 24px 16px;
+    padding: calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
@@ -399,6 +407,13 @@
     startTicking(active.start);
   } else {
     show("home");
+  }
+
+  // ---- オフライン起動用にサービスワーカーを登録 -----------------
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () { /* 失敗しても通常動作 */ });
+    });
   }
 })();
 </script>
