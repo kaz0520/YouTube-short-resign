@@ -1,0 +1,14 @@
+{
+  "name": "youtube-short-recorder",
+  "version": "0.1.0",
+  "description": "YouTubeショートの視聴を記録し、意識的な選択に変えるための個人用デスクトップアプリ（MVP）",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.0.0"
+  },
+  "license": "MIT",
+  "private": true
+}

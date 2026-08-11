@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ショート視聴レコーダー</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+    --good: #16a34a;
+    --normal: #6b7280;
+    --regret: #dc2626;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161b;
+      --card: #1e2128;
+      --text: #e8eaed;
+      --muted: #9aa1ac;
+      --border: #2c313a;
+      --accent: #3b82f6;
+      --shadow: 0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans",
+                 "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    min-height: 100%;
+    padding: 24px 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { width: 100%; max-width: 460px; }
+
+  header { text-align: center; margin-bottom: 20px; }
+  header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: .02em; }
+  header p { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .prompt {
+    text-align: center;
+  }
+  .prompt .lead { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; }
+  .prompt .sub { font-size: .92rem; color: var(--muted); white-space: pre-line; }
+
+  .btn {
+    display: block;
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #fff;
+    background: var(--accent);
+    transition: transform .05s ease, opacity .2s ease;
+    font-family: inherit;
+  }
+  .btn:active { transform: scale(.985); }
+  .btn.secondary { background: transparent; color: var(--muted); border: 1px solid var(--border); font-weight: 600; }
+  .btn.stop { background: var(--regret); }
+  .btn + .btn { margin-top: 10px; }
+
+  .timer {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    margin: 8px 0 6px;
+  }
+  .timer-label { text-align: center; color: var(--muted); font-size: .85rem; margin-bottom: 20px; }
+
+  .survey-title { text-align: center; font-weight: 700; margin-bottom: 4px; }
+  .survey-sub { text-align: center; color: var(--muted); font-size: .85rem; margin-bottom: 18px; }
+  .survey-time { text-align:center; color: var(--muted); font-size:.85rem; margin-bottom:18px; }
+  .survey-btn { font-size: 1rem; }
+  .survey-btn.good { background: var(--good); }
+  .survey-btn.normal { background: var(--normal); }
+  .survey-btn.regret { background: var(--regret); }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+  .tab {
+    flex: 1; text-align: center; padding: 10px; border-radius: 10px;
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    font-weight: 600; cursor: pointer; font-size: .9rem; font-family: inherit;
+  }
+  .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .stats { display: flex; gap: 10px; margin-bottom: 16px; }
+  .stat {
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 10px; text-align: center;
+  }
+  .stat .num { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .lbl { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+
+  .day-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 4px; border-bottom: 1px solid var(--border);
+  }
+  .day-row:last-child { border-bottom: none; }
+  .day-date { font-weight: 600; font-size: .9rem; }
+  .day-meta { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+  .badges { display: flex; gap: 5px; }
+  .badge { font-size: .72rem; padding: 2px 8px; border-radius: 999px; color: #fff; font-weight: 600; }
+  .badge.good { background: var(--good); }
+  .badge.normal { background: var(--normal); }
+  .badge.regret { background: var(--regret); }
+
+  .empty { text-align: center; color: var(--muted); padding: 32px 0; font-size: .9rem; }
+
+  .footer-actions { margin-top: 18px; text-align: center; }
+  .link {
+    background: none; border: none; color: var(--muted); font-size: .78rem;
+    cursor: pointer; text-decoration: underline; font-family: inherit;
+  }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>ショート視聴レコーダー</h1>
+    <p>無意識の視聴を、意識的な選択に</p>
+  </header>
+
+  <!-- ホーム / 起動時プロンプト -->
+  <section id="view-home">
+    <div class="card prompt">
+      <div class="lead">本当に見ますか？</div>
+      <div class="sub">禁止ではありません。
+意識して選択してください。</div>
+    </div>
+    <button class="btn" id="startBtn">視聴を開始する</button>
+    <button class="btn secondary" id="toHistoryBtn">履歴を見る</button>
+  </section>
+
+  <!-- 視聴中 -->
+  <section id="view-active" class="hidden">
+    <div class="card">
+      <div class="timer" id="timerDisplay">00:00</div>
+      <div class="timer-label" id="startedAtLabel">視聴中…</div>
+      <button class="btn stop" id="stopBtn">視聴を終了する</button>
+    </div>
+  </section>
+
+  <!-- アンケート -->
+  <section id="view-survey" class="hidden">
+    <div class="card">
+      <div class="survey-title">視聴おつかれさまでした</div>
+      <div class="survey-sub">今の気持ちを記録しましょう</div>
+      <div class="survey-time" id="surveyTime"></div>
+      <button class="btn survey-btn good" data-feeling="good">良かった</button>
+      <button class="btn survey-btn normal" data-feeling="normal">普通</button>
+      <button class="btn survey-btn regret" data-feeling="regret">後悔した</button>
+    </div>
+  </section>
+
+  <!-- 履歴 -->
+  <section id="view-history" class="hidden">
+    <div class="stats">
+      <div class="stat"><div class="num" id="statCount">0</div><div class="lbl">合計視聴回数</div></div>
+      <div class="stat"><div class="num" id="statTime">0分</div><div class="lbl">合計視聴時間</div></div>
+      <div class="stat"><div class="num" id="statRegret">0%</div><div class="lbl">後悔率</div></div>
+    </div>
+    <div class="card">
+      <div id="dayList"></div>
+    </div>
+    <div class="footer-actions">
+      <button class="btn secondary" id="backHomeBtn">ホームに戻る</button>
+      <button class="link" id="clearBtn">履歴をすべて削除</button>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "yt_short_sessions_v1";
+  var ACTIVE_KEY  = "yt_short_active_v1";
+
+  // ---- データ層 -------------------------------------------------
+  function loadSessions() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function saveSessions(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+  function loadActive() {
+    try { return JSON.parse(localStorage.getItem(ACTIVE_KEY)); }
+    catch (e) { return null; }
+  }
+  function saveActive(v) {
+    if (v) localStorage.setItem(ACTIVE_KEY, JSON.stringify(v));
+    else localStorage.removeItem(ACTIVE_KEY);
+  }
+
+  // ---- ユーティリティ -------------------------------------------
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  function fmtClock(ms) {
+    var s = Math.floor(ms / 1000);
+    var h = Math.floor(s / 3600);
+    var m = Math.floor((s % 3600) / 60);
+    var sec = s % 60;
+    if (h > 0) return h + ":" + pad(m) + ":" + pad(sec);
+    return pad(m) + ":" + pad(sec);
+  }
+  function fmtDuration(ms) {
+    var totalMin = Math.round(ms / 60000);
+    if (totalMin < 60) return totalMin + "分";
+    var h = Math.floor(totalMin / 60);
+    var m = totalMin % 60;
+    return h + "時間" + (m ? m + "分" : "");
+  }
+  function dateKey(ts) {
+    var d = new Date(ts);
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+  function fmtDateLabel(key) {
+    var parts = key.split("-");
+    var d = new Date(parts[0], parts[1] - 1, parts[2]);
+    var wd = ["日","月","火","水","木","金","土"][d.getDay()];
+    return (d.getMonth() + 1) + "月" + d.getDate() + "日 (" + wd + ")";
+  }
+  function fmtTimeOfDay(ts) {
+    var d = new Date(ts);
+    return pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+
+  // ---- 画面切り替え ---------------------------------------------
+  var views = {
+    home:    document.getElementById("view-home"),
+    active:  document.getElementById("view-active"),
+    survey:  document.getElementById("view-survey"),
+    history: document.getElementById("view-history")
+  };
+  function show(name) {
+    Object.keys(views).forEach(function (k) {
+      views[k].classList.toggle("hidden", k !== name);
+    });
+  }
+
+  // ---- タイマー -------------------------------------------------
+  var tickInterval = null;
+  var timerDisplay = document.getElementById("timerDisplay");
+  var startedAtLabel = document.getElementById("startedAtLabel");
+
+  function startTicking(startTs) {
+    function update() {
+      timerDisplay.textContent = fmtClock(Date.now() - startTs);
+    }
+    update();
+    startedAtLabel.textContent = fmtTimeOfDay(startTs) + " から視聴中…";
+    tickInterval = setInterval(update, 1000);
+  }
+  function stopTicking() {
+    if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
+  }
+
+  // ---- アクション -----------------------------------------------
+  var pendingSession = null; // {start, end, durationMs}
+
+  function beginViewing() {
+    var startTs = Date.now();
+    saveActive({ start: startTs });
+    show("active");
+    startTicking(startTs);
+  }
+
+  function endViewing() {
+    var active = loadActive();
+    if (!active) { show("home"); return; }
+    stopTicking();
+    var endTs = Date.now();
+    pendingSession = {
+      start: active.start,
+      end: endTs,
+      durationMs: endTs - active.start
+    };
+    saveActive(null);
+    document.getElementById("surveyTime").textContent =
+      "視聴時間: " + fmtDuration(pendingSession.durationMs);
+    show("survey");
+  }
+
+  function submitFeeling(feeling) {
+    if (!pendingSession) { show("home"); return; }
+    var list = loadSessions();
+    list.push({
+      start: pendingSession.start,
+      end: pendingSession.end,
+      durationMs: pendingSession.durationMs,
+      feeling: feeling,
+      date: dateKey(pendingSession.start)
+    });
+    saveSessions(list);
+    pendingSession = null;
+    renderHistory();
+    show("history");
+  }
+
+  // ---- 履歴描画 -------------------------------------------------
+  function renderHistory() {
+    var list = loadSessions();
+    var count = list.length;
+    var totalMs = 0, regret = 0;
+    list.forEach(function (s) {
+      totalMs += s.durationMs;
+      if (s.feeling === "regret") regret++;
+    });
+
+    document.getElementById("statCount").textContent = count;
+    document.getElementById("statTime").textContent = count ? fmtDuration(totalMs) : "0分";
+    document.getElementById("statRegret").textContent =
+      count ? Math.round((regret / count) * 100) + "%" : "0%";
+
+    // 日別に集計
+    var byDay = {};
+    list.forEach(function (s) {
+      if (!byDay[s.date]) byDay[s.date] = { count: 0, ms: 0, good: 0, normal: 0, regret: 0 };
+      var d = byDay[s.date];
+      d.count++; d.ms += s.durationMs; d[s.feeling]++;
+    });
+    var days = Object.keys(byDay).sort().reverse();
+
+    var container = document.getElementById("dayList");
+    if (!days.length) {
+      container.innerHTML = '<div class="empty">まだ記録がありません。</div>';
+      return;
+    }
+    container.innerHTML = days.map(function (key) {
+      var d = byDay[key];
+      var badges = "";
+      if (d.good)   badges += '<span class="badge good">良 ' + d.good + '</span>';
+      if (d.normal) badges += '<span class="badge normal">普 ' + d.normal + '</span>';
+      if (d.regret) badges += '<span class="badge regret">悔 ' + d.regret + '</span>';
+      return '<div class="day-row">' +
+               '<div>' +
+                 '<div class="day-date">' + fmtDateLabel(key) + '</div>' +
+                 '<div class="day-meta">' + d.count + '回 ・ ' + fmtDuration(d.ms) + '</div>' +
+               '</div>' +
+               '<div class="badges">' + badges + '</div>' +
+             '</div>';
+    }).join("");
+  }
+
+  // ---- イベント登録 ---------------------------------------------
+  document.getElementById("startBtn").addEventListener("click", beginViewing);
+  document.getElementById("stopBtn").addEventListener("click", endViewing);
+  document.getElementById("toHistoryBtn").addEventListener("click", function () {
+    renderHistory(); show("history");
+  });
+  document.getElementById("backHomeBtn").addEventListener("click", function () {
+    show("home");
+  });
+  document.getElementById("clearBtn").addEventListener("click", function () {
+    if (confirm("すべての履歴を削除します。よろしいですか？")) {
+      saveSessions([]); renderHistory();
+    }
+  });
+  Array.prototype.forEach.call(
+    document.querySelectorAll(".survey-btn"),
+    function (btn) {
+      btn.addEventListener("click", function () {
+        submitFeeling(btn.getAttribute("data-feeling"));
+      });
+    }
+  );
+
+  // ---- 初期化: 視聴中に閉じていた場合は復帰 ----------------------
+  var active = loadActive();
+  if (active && active.start) {
+    show("active");
+    startTicking(active.start);
+  } else {
+    show("home");
+  }
+})();
+</script>
+</body>
+</html>
