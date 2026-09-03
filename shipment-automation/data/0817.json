@@ -1,0 +1,79 @@
+{
+  "sheets": [
+    {
+      "name": "0817_福山",
+      "title": "2026年8月17日 月曜日 福山",
+      "groups": [
+        {"no": 1, "kokyaku": "95070", "bukken": "(ミヤコ)三興バルブ継手", "chiiki": "宮崎", "koguchi": 2, "bikou": "190・140",
+         "products": [{"name": "S-250SPW", "qty": 1}, {"name": "下網φ200", "qty": 1}, {"name": "メガネ板φ200", "qty": 1}, {"name": "ブラケットφ200", "qty": 4}]},
+        {"no": 2, "kokyaku": "95085", "bukken": "(川本第一)青葉機械工事", "chiiki": "宮城", "koguchi": 5, "bikou": "180×5",
+         "products": [{"name": "S-200SP", "qty": 5}]},
+        {"no": 3, "kokyaku": "95102", "bukken": "(ベンチ)ナガワ岩槻", "chiiki": "埼玉", "koguchi": 1, "bikou": "140",
+         "products": [{"name": "ヒューズ72℃", "qty": 1}, {"name": "NO.7-24", "qty": ""}]},
+        {"no": 4, "kokyaku": "95114", "bukken": "(ベンチ)ナガワ岩槻", "chiiki": "埼玉", "koguchi": 2, "bikou": "160×2",
+         "products": [{"name": "MS-200S-150", "qty": 1, "warn": true}, {"name": "ヒューズ72℃", "qty": 1}, {"name": "NO.7-28", "qty": ""}]},
+        {"no": 5, "kokyaku": "95117", "bukken": "(ベンチ)ナガワ岩槻", "chiiki": "埼玉", "koguchi": 2, "bikou": "160×2",
+         "products": [{"name": "MS-200S-150", "qty": 1, "warn": true}, {"name": "ヒューズ72℃", "qty": 1}, {"name": "NO.7-31", "qty": ""}]},
+        {"no": 6, "kokyaku": "95193", "bukken": "＊伝票個ずつ\n(昭栄)西本商店", "chiiki": "和歌山", "koguchi": 3, "bikou": "190・80・40",
+         "products": [{"name": "S-250SW-SUS", "qty": 1, "note": "分系内2/2"}, {"name": "下網φ300", "qty": 1}, {"name": "ブラケットφ300", "qty": 4}, {"name": "防火ダンパーφ300", "qty": 1, "note": "秤量OK"}]},
+        {"no": 7, "kokyaku": "95266", "bukken": "(ベンチ)ナガワ岩槻", "chiiki": "埼玉", "koguchi": 2, "bikou": "160×2",
+         "products": [{"name": "ヒューズ72℃", "qty": 1}, {"name": "MS-200S-150", "qty": 1, "warn": true}, {"name": "NO.7-38", "qty": ""}]},
+        {"no": 8, "kokyaku": "95321", "bukken": "(YUASA)住友化学(株)", "chiiki": "岐阜", "koguchi": 1, "bikou": "190",
+         "products": [{"name": "S-250SW", "qty": 1, "note": "送り状FAX OK"}]},
+        {"no": 9, "kokyaku": "95047", "bukken": "(サンパック)整伸", "chiiki": "兵庫", "koguchi": 1, "bikou": "160", "bukken_warn": true,
+         "products": [{"name": "MSQ-250S-250", "qty": 1, "note": "地図"}]},
+        {"no": 10, "kokyaku": "95406", "bukken": "(トラスコ)植山工務店", "chiiki": "和歌山", "koguchi": 1, "bikou": "120",
+         "products": [{"name": "SB-165", "qty": 1, "note": "収納庫 / 送り状FAX OK"}]},
+        {"no": 11, "kokyaku": "95403", "bukken": "(浅田電機商会)ユラワ商会", "chiiki": "東京", "koguchi": 1, "bikou": "190", "bukken_warn": true,
+         "products": [{"name": "SHD-360", "qty": 1}]},
+        {"no": 12, "kokyaku": "95383", "bukken": "(青山電陶)サニーハウス", "chiiki": "宮崎", "koguchi": 1, "bikou": "170",
+         "products": [{"name": "SB-150", "qty": 1, "note": "送り状FAX"}, {"name": "メガネ板φ150", "qty": 1}, {"name": "ブラケットφ150", "qty": 3}, {"name": "下網φ150", "qty": 1}, {"name": "T管φ150（Pコッフィ？）", "qty": 1, "warn": true}, {"name": "SV-6204ONFD", "qty": 1, "warn": true}]},
+        {"no": 13, "kokyaku": "95490", "bukken": "(YUASA)山信", "chiiki": "愛知", "koguchi": 1, "bikou": "112",
+         "products": [{"name": "ブラケットφ200", "qty": 6}]}
+      ]
+    },
+    {
+      "name": "0817_ヤマト",
+      "title": "2026年8月17日 月曜日 ヤマト",
+      "groups": [
+        {"no": 1, "kokyaku": "95115", "bukken": "(ベンチ)ナガワ岩槻", "chiiki": "埼玉", "koguchi": 1, "bikou": "100",
+         "products": [{"name": "防火ダンパーφ150", "qty": 1, "note": "NO.7-29"}]},
+        {"no": 2, "kokyaku": "95418", "bukken": "(東洋アルミ産業)北陸ブラスロン", "chiiki": "福井", "koguchi": 1, "bikou": "100", "bukken_warn": true,
+         "products": [{"name": "D-150-SUS", "qty": 1, "note": "送り状FAX OK"}]},
+        {"no": 3, "kokyaku": "95476", "bukken": "(昭栄)豊岡水田", "chiiki": "兵庫", "koguchi": 1, "bikou": "100",
+         "products": [{"name": "SD-180", "qty": 1, "note": "送り状FAX OK"}]},
+        {"no": 4, "kokyaku": "95468", "bukken": "(轟産業)八神", "chiiki": "大阪", "koguchi": 1, "bikou": "80",
+         "products": [{"name": "下網φ350", "qty": 1}]}
+      ]
+    },
+    {
+      "name": "0817_混合",
+      "title": "2026年8月17日 月曜日 混合（佐川・直送・引き取り）",
+      "groups": [
+        {"no": 1, "kokyaku": "95293", "bukken": "ナガワ京都", "chiiki": "", "koguchi": "", "bikou": "直送",
+         "products": [{"name": "NO.7-50", "qty": ""}]},
+        {"no": 2, "kokyaku": "95325", "bukken": "ナガワ京都", "chiiki": "", "koguchi": "", "bikou": "直送",
+         "products": [{"name": "NO.7-58", "qty": ""}]},
+        {"no": 3, "kokyaku": "95172\n667215", "bukken": "セキノ興産 小牧店", "chiiki": "", "koguchi": "", "bikou": "引き取り",
+         "products": [{"name": "SVO-600T", "qty": 1}, {"name": "袴 棟3寸", "qty": 1}]},
+        {"no": 4, "kokyaku": "95491", "bukken": "(F&W)徳永周二", "chiiki": "", "koguchi": 1, "bikou": "佐川",
+         "products": [{"name": "焼却器120型", "qty": 1, "warn": true}]},
+        {"no": 5, "kokyaku": "95492", "bukken": "(F&W)後藤延光", "chiiki": "", "koguchi": 1, "bikou": "佐川",
+         "products": [{"name": "焼却器120型", "qty": 1, "warn": true}]}
+      ]
+    }
+  ],
+  "review": [
+    ["0817_福山", 4, "ナガワ岩槻", "MS-200S-150", "MSQ型の可能性。型式頭がMS/MSQか要確認（サイズは変更せず）"],
+    ["0817_福山", 5, "ナガワ岩槻", "MS-200S-150", "同上"],
+    ["0817_福山", 7, "ナガワ岩槻", "MS-200S-150", "同上"],
+    ["0817_福山", 9, "整伸", "販売店(サンパック)", "既知販売店リストに無し。誤読の可能性"],
+    ["0817_福山", 11, "ユラワ商会", "客先名", "客先名の読みが不確実"],
+    ["0817_福山", 12, "サニーハウス", "T管φ150（Pコッフィ？）", "カタログ外・注記不明瞭"],
+    ["0817_福山", 12, "サニーハウス", "SV-6204ONFD", "型式が不確実（O/0・末尾NFD）"],
+    ["0817_ヤマト", 2, "北陸ブラスロン", "販売店(東洋アルミ産業)/客先", "販売店・客先名の読みが不確実"],
+    ["0817_混合", 3, "セキノ興産 小牧店", "配送区分(引き取り)", "丸印の判別が微妙。佐/直/引を最終確認"],
+    ["0817_混合", 4, "F&W 徳永周二", "焼却器120型", "カタログ外の特注品（在庫対象外）"],
+    ["0817_混合", 5, "F&W 後藤延光", "焼却器120型", "カタログ外の特注品（在庫対象外）"]
+  ]
+}
